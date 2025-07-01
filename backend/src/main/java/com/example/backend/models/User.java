@@ -1,9 +1,6 @@
 package com.example.backend.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class User {
@@ -17,6 +14,8 @@ public class User {
     private String mobile;
     private String address;
     private String role;
+    @Lob
+    @Column(columnDefinition = "MEDIUMBLOB")
     private byte[] image;
 
     public User() {}

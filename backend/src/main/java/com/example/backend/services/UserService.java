@@ -2,17 +2,23 @@ package com.example.backend.services;
 
 import com.example.backend.models.User;
 import com.example.backend.repositories.UserRepository;
-import com.example.backend.utils.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public String addUser(String name, String email, String password, String mobile, String address, String role, byte[] image) {
         if (!isUserExists(email)) {
@@ -21,11 +27,13 @@ public class UserService {
 
                 user.setName(name);
                 user.setEmail(email);
-                user.setPassword(PasswordUtils.encodePassword(password));
+                user.setPassword(passwordEncoder.encode(password));
                 user.setMobile(mobile);
                 user.setAddress(address);
                 user.setRole(role);
                 user.setImage(image);
+
+                userRepository.save(user);
 
                 return "User added successfully!";
             } catch (Exception e) {
@@ -71,12 +79,6 @@ public class UserService {
         }
     }
 
-    public boolean login(String email, String password) {
-        Optional<User> user = userRepository.findByEmail(email);
-
-        return user.map(value -> value.getPassword().equals(PasswordUtils.encodePassword(password))).orElse(false);
-    }
-
     public List<User> getAllUsers() {
         try {
             return userRepository.findAll();
@@ -95,5 +97,15 @@ public class UserService {
         }
 
         return userExits;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(), user.getPassword(), List.of()
+        );
     }
 }
