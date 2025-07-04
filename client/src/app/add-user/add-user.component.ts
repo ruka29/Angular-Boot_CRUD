@@ -1,7 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { NotificationComponent } from '../notification/notification.component';
 
 @Component({
@@ -16,30 +21,39 @@ export class AddUserComponent {
   messageType: string = '';
 
   addUserForm = new FormGroup({
-    firstName: new FormControl('', [Validators.required]),
-    lastName: new FormControl('', [Validators.required]),
-    phone: new FormControl('', [Validators.required]),
+    name: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required, Validators.email]),
-    username: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required]),
-    designation: new FormControl('Employee'),
+    mobile: new FormControl('', [Validators.required]),
+    address: new FormControl('', [Validators.required]),
+    role: new FormControl('user'),
   });
+
+  getCookie(name: string): string | null {
+    const match = document.cookie.match(
+      new RegExp('(^| )' + name + '=([^;]+)')
+    );
+    return match ? decodeURIComponent(match[2]) : null;
+  }
 
   onSubmit() {
     if (this.addUserForm.valid) {
-      const url =
-        'http://localhost:8080/server_war_exploded/api/manage-users/register';
+      const url = 'http://localhost:8080/api/manage-users/add';
       const userData = this.addUserForm.value;
 
-      this.http
-        .post<{ status: string; user: any }>(url, userData)
-        .subscribe({
+      const token = this.getCookie('jwt_token');
+
+      if (token) {
+        const headers = new HttpHeaders({
+          Authorization: `Bearer ${token}`,
+        });
+
+        this.http.post<{ message: string; error: string }>(url, userData, { headers }).subscribe({
           next: (response) => {
             console.log('Success:', response);
 
             this.addUserForm.reset();
 
-            this.message = 'User added successfully!';
+            this.message = response.message;
             this.messageType = 'success';
 
             setTimeout(() => {
@@ -49,10 +63,7 @@ export class AddUserComponent {
           },
           error: (error) => {
             if (error.error && error.error.message) {
-              console.error(
-                'User registration failed:',
-                error.error.message
-              );
+              console.error('User registration failed:', error.error.message);
               this.message = error.error.message;
               this.messageType = 'error';
 
@@ -68,6 +79,7 @@ export class AddUserComponent {
             }
           },
         });
+      }
     } else {
       console.log('Invalid Form');
       this.message = 'All fields are required!';

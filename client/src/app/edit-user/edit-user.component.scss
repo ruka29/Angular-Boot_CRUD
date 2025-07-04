@@ -33,6 +33,10 @@
       @apply w-full px-4 py-3 border border-gray-300 rounded-[9px] focus:outline-none focus:ring-1 focus:ring-[#FFB800] font-nunito;
     }
   }
+
+  .check-box{
+    @apply appearance-none w-5 h-5 border-2 border-gray-300 rounded bg-white cursor-pointer relative transition-all duration-300 ease-out m-0 hover:border-[#4CAF50] checked:bg-[#4CAF50] checked:border-[#4CAF50] focus:outline-none focus:shadow-[0_0_0_3px_rgba(76,175,80,0.2)];
+  }
   
   .right-container {
     @apply flex flex-col w-[550px];

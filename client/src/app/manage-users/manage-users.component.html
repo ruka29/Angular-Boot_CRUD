@@ -35,10 +35,10 @@
           <thead class="table-heading">
             <tr class="table-row">
               <th>User ID</th>
-              <th>Driver Name</th>
+              <th>User Name</th>
               <th>Email</th>
               <th>Phone</th>
-              <th>Username</th>
+              <th>Address</th>
             </tr>
           </thead>
           <tbody class="table-body">
@@ -49,11 +49,11 @@
             >
               <td class="table-data">{{ user.id }}</td>
               <td class="table-data">
-                {{ user.firstName + " " + user.lastName }}
+                {{ user.name }}
               </td>
               <td class="table-data">{{ user.email }}</td>
-              <td class="table-data">{{ user.phone }}</td>
-              <td class="table-data">{{ user.username }}</td>
+              <td class="table-data">{{ user.mobile }}</td>
+              <td class="table-data">{{ user.address }}</td>
             </tr>
           </tbody>
         </table>

@@ -1,7 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, inject, Input } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { NotificationComponent } from '../notification/notification.component';
 
 @Component({
@@ -16,65 +21,77 @@ export class EditUserComponent {
   private http = inject(HttpClient);
   message: string = '';
   messageType: string = '';
+  isChecked: boolean = false;
 
   updateUserForm = new FormGroup({
     id: new FormControl('', [Validators.required]),
-    firstName: new FormControl('', [Validators.required]),
-    lastName: new FormControl('', [Validators.required]),
-    phone: new FormControl('', [Validators.required]),
+    name: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required, Validators.email]),
-    username: new FormControl('', [Validators.required]),
-    designation: new FormControl('Employee'),
+    mobile: new FormControl('', [Validators.required]),
+    address: new FormControl('', [Validators.required]),
+    reset: new FormControl(),
+    role: new FormControl('user'),
   });
 
   ngOnInit() {
     if (this.user) {
       this.updateUserForm.patchValue({
         id: this.user.id,
-        firstName: this.user.firstName,
-        lastName: this.user.lastName,
-        phone: this.user.phone,
+        name: this.user.name,
         email: this.user.email,
-        username: this.user.username,
+        mobile: this.user.mobile,
+        address: this.user.address,
       });
     }
   }
 
+  getCookie(name: string): string | null {
+    const match = document.cookie.match(
+      new RegExp('(^| )' + name + '=([^;]+)')
+    );
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
   onSubmit() {
     if (this.updateUserForm.valid) {
-      const url =
-        'http://localhost:8080/server_war_exploded/api/manage-users/update';
+      const url = 'http://localhost:8080/api/manage-users/update';
       const userData = this.updateUserForm.value;
 
-      console.log('User Data:', userData);
+      const token = this.getCookie('jwt_token');
 
-      this.http.post<{ status: string; user: any }>(url, userData).subscribe({
-        next: (response) => {
-          console.log('Success:', response);
+      if (token) {
+        const headers = new HttpHeaders({
+          Authorization: `Bearer ${token}`,
+        });
 
-          this.message = 'Driver updated successfully!';
-          this.messageType = 'success';
+        this.http.post<{ message: string; error: string }>(url, userData, { headers }).subscribe({
+          next: (response) => {
+            console.log('Success:', response);
 
-          setTimeout(() => {
-            this.message = '';
-            this.messageType = '';
-          }, 5000);
-        },
-        error: (error) => {
-          if (error.error && error.error.message) {
-            console.error('Driver update failed:', error.error.message);
-            this.message = error.error.message;
-            this.messageType = 'error';
+            this.message = response.message;
+            this.messageType = 'success';
 
             setTimeout(() => {
               this.message = '';
               this.messageType = '';
             }, 5000);
-          } else {
-            console.error('update failed:', 'An unknown error occurred.');
-          }
-        },
-      });
+          },
+          error: (error) => {
+            if (error.error && error.error.message) {
+              console.error('User update failed:', error.error.message);
+              this.message = error.error.message;
+              this.messageType = 'error';
+
+              setTimeout(() => {
+                this.message = '';
+                this.messageType = '';
+              }, 5000);
+            } else {
+              console.error('update failed:', 'An unknown error occurred.');
+            }
+          },
+        });
+      }
     } else {
       console.log('Invalid Form');
       this.message = 'All fields are required!';
@@ -84,6 +101,19 @@ export class EditUserComponent {
         this.message = '';
         this.messageType = '';
       }, 5000);
+    }
+  }
+
+  setIsChecked() {
+    this.isChecked = !this.isChecked;
+    if (this.isChecked) {
+      this.updateUserForm.patchValue({
+        reset: true,
+      });
+    } else {
+      this.updateUserForm.patchValue({
+        reset: false,
+      });
     }
   }
 

@@ -20,7 +20,10 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public String addUser(String name, String email, String password, String mobile, String address, String role, byte[] image) {
+    @Autowired
+    private EmailService emailService;
+
+    public String addUser(String name, String email, String password, String mobile, String address, String role) {
         if (!isUserExists(email)) {
             try {
                 User user = new User();
@@ -31,11 +34,14 @@ public class UserService implements UserDetailsService {
                 user.setMobile(mobile);
                 user.setAddress(address);
                 user.setRole(role);
-                user.setImage(image);
 
                 userRepository.save(user);
 
-                return "User added successfully!";
+                if (emailService.sendEmail(email, "new")) {
+                    return "User added successfully!";
+                } else {
+                    return "Failed to send reset email!";
+                }
             } catch (Exception e) {
                 return "Failed to add user!";
             }
@@ -44,8 +50,8 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public String updateUser(Long id, String name, String email, String mobile, String address, String role, byte[] image) {
-        User existingUser = userRepository.findById(id).orElse(null);
+    public String updateUser(String id, String name, String email, String mobile, String address) {
+        User existingUser = userRepository.findById(Long.valueOf(id)).orElse(null);
 
         if (existingUser != null) {
             try {
@@ -53,7 +59,26 @@ public class UserService implements UserDetailsService {
                 existingUser.setEmail(email);
                 existingUser.setMobile(mobile);
                 existingUser.setAddress(address);
-                existingUser.setRole(role);
+
+                userRepository.save(existingUser);
+                return "User updated successfully!";
+            } catch (Exception e) {
+                return "Failed to update user!";
+            }
+        } else {
+            return "User does not exist!";
+        }
+    }
+
+    public String updateUserProfile(String id, String name, String email, String mobile, String address, byte[] image) {
+        User existingUser = userRepository.findById(Long.valueOf(id)).orElse(null);
+
+        if (existingUser != null) {
+            try {
+                existingUser.setName(name);
+                existingUser.setEmail(email);
+                existingUser.setMobile(mobile);
+                existingUser.setAddress(address);
                 existingUser.setImage(image);
 
                 userRepository.save(existingUser);
@@ -61,6 +86,45 @@ public class UserService implements UserDetailsService {
             } catch (Exception e) {
                 return "Failed to update user!";
             }
+        } else {
+            return "User does not exist!";
+        }
+    }
+
+    public String updateUserWithPwd(String id, String name, String email, String mobile, String address, String password) {
+        User existingUser = userRepository.findById(Long.valueOf(id)).orElse(null);
+
+        if (existingUser != null) {
+            try {
+                existingUser.setName(name);
+                existingUser.setEmail(email);
+                existingUser.setMobile(mobile);
+                existingUser.setAddress(address);
+                existingUser.setPassword(passwordEncoder.encode(password));
+
+                userRepository.save(existingUser);
+
+                if (emailService.sendEmail(email, "reset")) {
+                    return "User updated successfully!";
+                } else {
+                    return "Failed to send reset email!";
+                }
+            } catch (Exception e) {
+                return "Failed to update user!";
+            }
+        } else {
+            return "User does not exist!";
+        }
+    }
+
+    public String updateUserPwd(String email, String password) {
+        User existingUser = userRepository.findByEmail(email).orElse(null);
+
+        if (existingUser != null) {
+            existingUser.setPassword(passwordEncoder.encode(password));
+
+            userRepository.save(existingUser);
+            return "Password updated successfully!";
         } else {
             return "User does not exist!";
         }
@@ -79,9 +143,9 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers(String role) {
         try {
-            return userRepository.findAll();
+            return userRepository.findByRole(role);
         } catch (Exception e) {
             return null;
         }
@@ -107,5 +171,10 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(), user.getPassword(), List.of()
         );
+    }
+
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
     }
 }

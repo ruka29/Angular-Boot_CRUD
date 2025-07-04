@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { TabButtonComponent } from '../tab-button/tab-button.component';
 import { Router } from '@angular/router';
 
@@ -10,7 +18,8 @@ import { Router } from '@angular/router';
   templateUrl: './dashboard-side-panel.component.html',
   styleUrl: './dashboard-side-panel.component.scss',
 })
-export class DashboardSidePanelComponent {
+export class DashboardSidePanelComponent implements OnInit {
+  private http = inject(HttpClient);
   private router = inject(Router);
 
   @Input() activeTab: string = '';
@@ -19,18 +28,46 @@ export class DashboardSidePanelComponent {
   firstName: string = '';
   designation: string = '';
   greeting: string = '';
-  tabButtons: {tabName: string, iconPath: string}[] = [];
+  tabButtons: { tabName: string; iconPath: string }[] = [];
 
-  constructor() {
-    const user = sessionStorage.getItem('user');
-    if (user) {
-      const userData = JSON.parse(user);
-      this.firstName = userData.firstName;
-      this.designation = userData.designation;
+  getCookie(name: string): string | null {
+    const match = document.cookie.match(
+      new RegExp('(^| )' + name + '=([^;]+)')
+    );
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
+  ngOnInit(): void {
+    const url = 'http://localhost:8080/api/auth/get-user';
+
+    const token = this.getCookie('jwt_token');
+
+    if (token) {
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+      });
+
+      this.http.get<{ user: any }>(url, { headers }).subscribe({
+        next: (response) => {
+          const userData = response.user;
+          console.log('User data fetched successfully:', response.user);
+          sessionStorage.setItem('user', JSON.stringify(response.user));
+
+          this.firstName = userData.name;
+          this.designation = userData.role;
+
+          this.setGreeting();
+          this.setButtns();
+        },
+        error: (err) => {
+          console.error('User fetch failed:', err);
+          this.router.navigate(['/login']);
+        },
+      });
+    } else {
+      console.error('No JWT token found in cookies.');
+      this.router.navigate(['/login']);
     }
-
-    this.setGreeting();
-    this.setButtns();
   }
 
   setActive(tab: string) {
@@ -50,29 +87,22 @@ export class DashboardSidePanelComponent {
 
   setButtns() {
     const employeeButtons = [
-      {tabName: 'new reservation', iconPath: '/add.png'},
-      {tabName: 'manage customers', iconPath: '/customer.png'},
-      {tabName: 'manage reservations', iconPath: '/time-management.png'}
+      { tabName: 'new reservation', iconPath: '/add.png' },
+      { tabName: 'manage customers', iconPath: '/customer.png' },
+      { tabName: 'manage reservations', iconPath: '/time-management.png' },
     ];
 
     const adminButtons = [
-      {tabName: 'manage vehicles', iconPath: '/gear.png'},
-      {tabName: 'manage drivers', iconPath: '/person.png'},
-      {tabName: 'manage users', iconPath: '/management.png'},
-      {tabName: 'system settings', iconPath: '/system.png'}
+      { tabName: 'manage users', iconPath: '/management.png' },
     ];
 
-    const driverButtons = [
-      {tabName: 'new reservation', iconPath: '/add.png'},
-      {tabName: 'manage customers', iconPath: '/customer.png'},
-      {tabName: 'manage reservations', iconPath: '/time-management.png'}
-    ];
-
-    this.tabButtons = this.designation === 'Employee' ? employeeButtons : this.designation === 'Admin' ? adminButtons : driverButtons;
+    this.tabButtons =
+      this.designation === 'user' ? employeeButtons : adminButtons;
   }
 
   logOut() {
     sessionStorage.removeItem('user');
+    document.cookie = 'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     this.router.navigate(['/login']);
   }
 }
