@@ -61,6 +61,7 @@ export class ChangePasswordComponent implements OnInit {
   loginForm = new FormGroup(
     {
       email: new FormControl(this.email),
+      token: new FormControl(this.token),
       password: new FormControl('', [
         Validators.required,
         Validators.minLength(3),
@@ -75,6 +76,7 @@ export class ChangePasswordComponent implements OnInit {
       const url = 'http://localhost:8080/api/auth/change-password';
       const loginData = this.loginForm.value;
       loginData.email = this.email;
+      loginData.token = this.token;
 
       this.http
         .post<{ message: string; error: string }>(url, loginData)
@@ -87,18 +89,28 @@ export class ChangePasswordComponent implements OnInit {
             this.router.navigate(['/login']);
           },
           error: (error) => {
-          if (error.error && error.error.error) {
-            console.error('Login Failed:', error.error.error);
-            this.errormessage = error.error.error;
-          } else {
-            console.error('Login Failed:', 'An unknown error occurred.');
-            this.errormessage = 'An unknown error occurred.';
-          }
-        },
+            if (error.error && error.error.error) {
+              console.error('Login Failed:', error.error.error);
+
+              if (error.error.error === 'Token already exists!') {
+                this.errormessage = 'Your password already changed! Please login.';
+              } else {
+                this.errormessage = error.error.error;
+              }
+                            
+            } else {
+              console.error('Login Failed:', 'An unknown error occurred.');
+              this.errormessage = 'An unknown error occurred.';
+            }
+          },
         });
     } else {
       console.log('Invalid Form');
       this.errormessage = 'Passwords do not match!';
     }
+  }
+
+  onBackToLogin() {
+    this.router.navigate(['/login']);
   }
 }

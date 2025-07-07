@@ -51,15 +51,19 @@ public class AuthController {
         Map<String, String> response = new HashMap<>();
 
         try {
+            String token = request.get("token");
             String email = request.get("email");
             String password = request.get("password");
 
-            String message = userService.updateUserPwd(email, password);
+            String message = userService.updateUserPwd(token, email, password);
 
             if (Objects.equals(message, "Password updated successfully!")) {
                 response.put("message", message);
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
             } else if (Objects.equals(message, "User does not exist!")) {
+                response.put("error", message);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            } else if (Objects.equals(message, "Token already exists!")) {
                 response.put("error", message);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             } else {

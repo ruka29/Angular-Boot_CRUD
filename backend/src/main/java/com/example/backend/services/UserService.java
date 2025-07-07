@@ -1,7 +1,10 @@
 package com.example.backend.services;
 
+import com.example.backend.models.Token;
 import com.example.backend.models.User;
+import com.example.backend.repositories.TokenRepository;
 import com.example.backend.repositories.UserRepository;
+import com.example.backend.utils.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,10 +21,16 @@ public class UserService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Autowired
+    private TokenRepository tokenRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private JWTUtil jwtUtil;
 
     public String addUser(String name, String email, String password, String mobile, String address, String role) {
         if (!isUserExists(email)) {
@@ -117,16 +126,31 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public String updateUserPwd(String email, String password) {
-        User existingUser = userRepository.findByEmail(email).orElse(null);
+    public String updateUserPwd(String token, String email, String password) {
+        if (jwtUtil.validateToken(token)) {
+            Token existigToken = tokenRepository.findByToken(token).orElse(null);
 
-        if (existingUser != null) {
-            existingUser.setPassword(passwordEncoder.encode(password));
+            if (existigToken == null) {
+                User existingUser = userRepository.findByEmail(email).orElse(null);
 
-            userRepository.save(existingUser);
-            return "Password updated successfully!";
+                if (existingUser != null) {
+                    existingUser.setPassword(passwordEncoder.encode(password));
+
+                    userRepository.save(existingUser);
+
+                    Token newToken = new Token();
+                    newToken.setToken(token);
+
+                    tokenRepository.save(newToken);
+                    return "Password updated successfully!";
+                } else {
+                    return "User does not exist!";
+                }
+            } else {
+                return "Token already exists!";
+            }
         } else {
-            return "User does not exist!";
+            return "Invalid request!";
         }
     }
 
