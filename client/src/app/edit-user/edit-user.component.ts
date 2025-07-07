@@ -25,10 +25,24 @@ export class EditUserComponent {
 
   updateUserForm = new FormGroup({
     id: new FormControl('', [Validators.required]),
-    name: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    mobile: new FormControl('', [Validators.required]),
-    address: new FormControl('', [Validators.required]),
+    name: new FormControl('', [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(50),
+    ]),
+    email: new FormControl('', [
+      Validators.required,
+      Validators.email,
+      Validators.maxLength(100),
+    ]),
+    mobile: new FormControl('', [
+      Validators.required,
+      Validators.pattern('^[0-9]{10}$'),
+    ]),
+    address: new FormControl('', [
+      Validators.required,
+      Validators.minLength(3),
+    ]),
     reset: new FormControl(),
     role: new FormControl('user'),
   });
@@ -64,33 +78,35 @@ export class EditUserComponent {
           Authorization: `Bearer ${token}`,
         });
 
-        this.http.post<{ message: string; error: string }>(url, userData, { headers }).subscribe({
-          next: (response) => {
-            console.log('Success:', response);
+        this.http
+          .post<{ message: string; error: string }>(url, userData, { headers })
+          .subscribe({
+            next: (response) => {
+              console.log('Success:', response);
 
-            this.message = response.message;
-            this.messageType = 'success';
-
-            setTimeout(() => {
-              this.message = '';
-              this.messageType = '';
-            }, 5000);
-          },
-          error: (error) => {
-            if (error.error && error.error.message) {
-              console.error('User update failed:', error.error.message);
-              this.message = error.error.message;
-              this.messageType = 'error';
+              this.message = response.message;
+              this.messageType = 'success';
 
               setTimeout(() => {
                 this.message = '';
                 this.messageType = '';
               }, 5000);
-            } else {
-              console.error('update failed:', 'An unknown error occurred.');
-            }
-          },
-        });
+            },
+            error: (error) => {
+              if (error.error && error.error.message) {
+                console.error('User update failed:', error.error.message);
+                this.message = error.error.message;
+                this.messageType = 'error';
+
+                setTimeout(() => {
+                  this.message = '';
+                  this.messageType = '';
+                }, 5000);
+              } else {
+                console.error('update failed:', 'An unknown error occurred.');
+              }
+            },
+          });
       }
     } else {
       console.log('Invalid Form');

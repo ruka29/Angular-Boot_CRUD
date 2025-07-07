@@ -1,46 +1,108 @@
 <div class="container">
-    <div class="heading">
-      <p>Manage Users > Add New User</p>
-    </div>
-  
-    <div class="user-data-container">
-      <form [formGroup]="addUserForm" (ngSubmit)="onSubmit()">
-        <div class="form-container">
-          <div class="left-container">
-            <div class="user-input">
-              <label for="name">Name</label>
-              <input type="text" formControlName="name" />
-            </div>
-  
-            <div class="user-input">
-              <label for="mobile">Phone</label>
-              <input type="text" formControlName="mobile" />
-            </div>
-          </div>
-  
-          <div class="right-container">  
-            <div class="user-input">
-              <label for="email">Email</label>
-              <input type="email" formControlName="email" />
-            </div>
-  
-            <div class="user-input">
-              <label for="address">Address</label>
-              <input type="text" formControlName="address" />
-            </div>
-          </div>
-        </div>
-        <div class="save-btn">
-          <button type="submit">Add User</button>
-        </div>
-      </form>
-    </div>
-  
-    <app-notification
-      *ngIf="message"
-      [message]="message"
-      [messageType]="messageType"
-      (close)="closeNotification()"
-    ></app-notification>
+  <div class="heading">
+    <p>Manage Users > Add New User</p>
   </div>
-  
+
+  <div class="user-data-container">
+    <form [formGroup]="addUserForm" (ngSubmit)="onSubmit()">
+      <div class="form-container">
+        <div class="left-container">
+          <div class="user-input">
+            <label for="name">Name</label>
+            <input type="text" formControlName="name" />
+
+            <div
+              *ngIf="
+                addUserForm.get('name')?.touched &&
+                addUserForm.get('name')?.errors
+              "
+              class="field-error"
+            >
+              <small *ngIf="addUserForm.get('name')?.hasError('required')"
+                >Name is required.</small
+              >
+              <small *ngIf="addUserForm.get('name')?.hasError('minlength')"
+                >Name must be at least 3 characters.</small
+              >
+              <small *ngIf="addUserForm.get('name')?.hasError('maxlength')"
+                >Name cannot exceed 50 characters.</small
+              >
+            </div>
+          </div>
+
+          <div class="user-input">
+            <label for="mobile">Phone</label>
+            <input type="text" formControlName="mobile" />
+
+            <div
+              *ngIf="
+                addUserForm.get('mobile')?.touched &&
+                addUserForm.get('mobile')?.errors
+              "
+              class="field-error"
+            >
+              <small *ngIf="addUserForm.get('mobile')?.hasError('required')"
+                >Mobile number is required.</small
+              >
+              <small *ngIf="addUserForm.get('mobile')?.hasError('pattern')"
+                >Mobile number must be 10 digits.</small
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="right-container">
+          <div class="user-input">
+            <label for="email">Email</label>
+            <input type="email" formControlName="email" />
+            
+            <div
+              *ngIf="
+                addUserForm.get('email')?.touched &&
+                addUserForm.get('email')?.errors
+              "
+              class="field-error"
+            >
+              <small *ngIf="addUserForm.get('email')?.hasError('required')"
+                >Email is required.</small
+              >
+              <small *ngIf="addUserForm.get('email')?.hasError('email')"
+                >Invalid email format.</small
+              >
+            </div>
+          </div>
+
+          <div class="user-input">
+            <label for="address">Address</label>
+            <input type="text" formControlName="address" />
+
+            <div
+              *ngIf="
+                addUserForm.get('address')?.touched &&
+                addUserForm.get('address')?.errors
+              "
+              class="field-error"
+            >
+              <small *ngIf="addUserForm.get('address')?.hasError('required')"
+                >Address is required.</small
+              >
+              <small *ngIf="addUserForm.get('address')?.hasError('minlength')"
+                >Address must be at least 5 characters.</small
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="save-btn">
+        <button type="submit">Add User</button>
+      </div>
+    </form>
+  </div>
+
+  <app-notification
+    *ngIf="message"
+    [message]="message"
+    [messageType]="messageType"
+    (close)="closeNotification()"
+  ></app-notification>
+</div>

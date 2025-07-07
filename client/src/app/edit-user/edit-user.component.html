@@ -10,16 +10,64 @@
           <div class="user-input">
             <label for="name">Name</label>
             <input type="text" formControlName="name" />
+
+            <div
+              *ngIf="
+                updateUserForm.get('name')?.touched &&
+                updateUserForm.get('name')?.errors
+              "
+              class="field-error"
+            >
+              <small *ngIf="updateUserForm.get('name')?.hasError('required')"
+                >Name is required.</small
+              >
+              <small *ngIf="updateUserForm.get('name')?.hasError('minlength')"
+                >Name must be at least 3 characters.</small
+              >
+              <small *ngIf="updateUserForm.get('name')?.hasError('maxlength')"
+                >Name cannot exceed 50 characters.</small
+              >
+            </div>
           </div>
 
           <div class="user-input">
             <label for="phone">Phone</label>
             <input type="text" formControlName="mobile" />
+
+            <div
+              *ngIf="
+                updateUserForm.get('mobile')?.touched &&
+                updateUserForm.get('mobile')?.errors
+              "
+              class="field-error"
+            >
+              <small *ngIf="updateUserForm.get('mobile')?.hasError('required')"
+                >Mobile number is required.</small
+              >
+              <small *ngIf="updateUserForm.get('mobile')?.hasError('pattern')"
+                >Mobile number must be 10 digits.</small
+              >
+            </div>
           </div>
 
           <div class="user-input">
             <label for="address">Address</label>
             <input type="text" formControlName="address" />
+
+            <div
+              *ngIf="
+                updateUserForm.get('address')?.touched &&
+                updateUserForm.get('address')?.errors
+              "
+              class="field-error"
+            >
+              <small *ngIf="updateUserForm.get('address')?.hasError('required')"
+                >Address is required.</small
+              >
+              <small *ngIf="updateUserForm.get('address')?.hasError('minlength')"
+                >Address must be at least 5 characters.</small
+              >
+            </div>
           </div>
         </div>
 
@@ -27,6 +75,21 @@
           <div class="user-input">
             <label for="email">Email</label>
             <input type="email" formControlName="email" />
+
+            <div
+              *ngIf="
+                updateUserForm.get('email')?.touched &&
+                updateUserForm.get('email')?.errors
+              "
+              class="field-error"
+            >
+              <small *ngIf="updateUserForm.get('email')?.hasError('required')"
+                >Email is required.</small
+              >
+              <small *ngIf="updateUserForm.get('email')?.hasError('email')"
+                >Invalid email format.</small
+              >
+            </div>
           </div>
 
           <div class="user-input">

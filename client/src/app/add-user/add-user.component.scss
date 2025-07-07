@@ -37,6 +37,12 @@
   .right-container {
     @apply flex flex-col w-[550px];
   }
+
+  .field-error {
+    small {
+      @apply text-red-500 text-sm font-nunito;
+    }
+  }
   
   .save-btn {
     @apply flex justify-center mt-5;
