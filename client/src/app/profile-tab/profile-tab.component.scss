@@ -66,3 +66,19 @@
     @apply w-[250px] bg-[#FFB800] text-black py-3 rounded-[9px] hover:bg-amber-500 transition duration-300 font-nunito font-bold;
   }
 }
+
+.password-reset-section {
+  @apply flex flex-col mt-10 w-[1200px] p-6 bg-gray-50 rounded-[15px] border border-gray-200;
+
+  .user-input {
+    @apply flex flex-row items-center justify-between mb-0;
+
+    label {
+      @apply text-xl font-nunito mb-0 flex-1;
+    }
+
+    button {
+      @apply w-[200px] bg-white text-black py-3 px-6 rounded-[9px] border border-[#FFB800] hover:bg-[#FFB800] hover:text-black transition duration-300 font-nunito font-bold;
+    }
+  }
+}

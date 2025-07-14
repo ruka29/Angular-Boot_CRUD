@@ -77,6 +77,12 @@
         <button type="submit">Save</button>
       </div>
     </form>
+    <div class="password-reset-section">
+      <div class="user-input">
+        <label for="password-reset">Request password reset.</label>
+        <button (click)="handleClickRequest()">Request</button>
+      </div>
+    </div>
   </div>
   <app-notification
     *ngIf="message"

@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { NotificationComponent } from '../notification/notification.component';
+import { NotificationService } from '../notification.service';
 
 @Component({
   selector: 'app-profile-tab',
@@ -40,7 +41,7 @@ export class ProfileTabComponent {
     role: new FormControl('', [Validators.required]),
   });
 
-  constructor() {
+  constructor(private notificationService: NotificationService) {
     const user = sessionStorage.getItem('user');
     if (user) {
       const userData = JSON.parse(user);
@@ -142,6 +143,17 @@ export class ProfileTabComponent {
         this.messageType = '';
       }, 5000);
     }
+  }
+
+  handleClickRequest() {
+    this.notificationService.sendPasswordResetRequest(this.email);
+    this.message = 'Request sent!';
+    this.messageType = 'success';
+
+    setTimeout(() => {
+      this.message = '';
+      this.messageType = '';
+    }, 5000);
   }
 
   closeNotification() {

@@ -1,11 +1,20 @@
-<button
-  class="btn"
-  (click)="setActive()"
-  [ngClass]="{
-    'bg-[#FFB8008C]': activeTab === tabName,
-    'bg-white': activeTab !== tabName
-  }"
->
-  <img [src]="iconPath" alt="add icon" />
-  <span>{{ tabName | titlecase }}</span>
-</button>
+<div class="relative w-full">
+  <button
+    class="btn w-full"
+    (click)="setActive()"
+    [ngClass]="{
+      'bg-[#FFB8008C]': activeTab === tabName,
+      'bg-white': activeTab !== tabName
+    }"
+  >
+    <img [src]="iconPath" alt="icon" />
+    <span>{{ tabName | titlecase }}</span>
+
+    <div
+      *ngIf="tabName === 'notifications' && notificationCount > 0"
+      class="absolute top-3.8 right-6 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+    >
+      {{ notificationCount }}
+    </div>
+  </button>
+</div>

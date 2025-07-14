@@ -19,6 +19,7 @@ import { AddUserComponent } from '../add-user/add-user.component';
 import { EditUserComponent } from '../edit-user/edit-user.component';
 import { EditDriverComponent } from '../edit-driver/edit-driver.component';
 import { EditVehicleComponent } from '../edit-vehicle/edit-vehicle.component';
+import { NotificationTabComponent } from '../notification-tab/notification-tab.component';
 
 @Component({
   selector: 'app-dashboard-action-panel',
@@ -43,8 +44,9 @@ import { EditVehicleComponent } from '../edit-vehicle/edit-vehicle.component';
     AddUserComponent,
     EditUserComponent,
     EditDriverComponent,
-    EditVehicleComponent
-  ],
+    EditVehicleComponent,
+    NotificationTabComponent
+],
   templateUrl: './dashboard-action-panel.component.html',
   styleUrl: './dashboard-action-panel.component.scss',
 })

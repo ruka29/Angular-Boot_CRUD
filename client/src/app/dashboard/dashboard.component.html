@@ -9,4 +9,11 @@
     [selectedUser]="selectedUser"
     (tabChange)="setActive($event.tab, $event.user)"
   ></app-dashboard-action-panel>
+
+  <app-notification
+    *ngIf="message"
+    [message]="message"
+    [messageType]="messageType"
+    (close)="closeNotification()"
+  ></app-notification>
 </div>

@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { TabButtonComponent } from '../tab-button/tab-button.component';
 import { Router } from '@angular/router';
+import { NotificationService } from '../notification.service';
 
 @Component({
   selector: 'app-dashboard-side-panel',
@@ -29,13 +30,9 @@ export class DashboardSidePanelComponent implements OnInit {
   designation: string = '';
   greeting: string = '';
   tabButtons: { tabName: string; iconPath: string }[] = [];
+  notificationCount: number = 0;
 
-  getCookie(name: string): string | null {
-    const match = document.cookie.match(
-      new RegExp('(^| )' + name + '=([^;]+)')
-    );
-    return match ? decodeURIComponent(match[2]) : null;
-  }
+  constructor(private notificationService: NotificationService) {}
 
   ngOnInit(): void {
     const url = 'http://localhost:8080/api/auth/get-user';
@@ -50,14 +47,35 @@ export class DashboardSidePanelComponent implements OnInit {
       this.http.get<{ user: any }>(url, { headers }).subscribe({
         next: (response) => {
           const userData = response.user;
-          console.log('User data fetched successfully:', response.user);
+          // console.log('User data fetched successfully:', response.user);
           sessionStorage.setItem('user', JSON.stringify(response.user));
 
           this.firstName = userData.name;
           this.designation = userData.role;
 
           this.setGreeting();
-          this.setButtns();
+
+          if (this.designation === 'admin') {
+            this.notificationService.getAllNotifications(
+              token,
+              (unreadCount) => {
+                this.notificationCount = unreadCount;
+                console.log(
+                  'Unread notifications count: ',
+                  this.notificationCount
+                );
+                this.setButtns();
+              }
+            );
+
+            this.notificationService.notificationCount$.subscribe(() => {
+              this.notificationCount = this.notificationService.notificationCount$.getValue();
+              console.log('Updated notification count:', this.notificationCount);
+              this.setButtns();
+            })
+          } else {
+            this.setButtns();
+          }
         },
         error: (err) => {
           console.error('User fetch failed:', err);
@@ -68,6 +86,13 @@ export class DashboardSidePanelComponent implements OnInit {
       console.error('No JWT token found in cookies.');
       this.router.navigate(['/login']);
     }
+  }
+
+  getCookie(name: string): string | null {
+    const match = document.cookie.match(
+      new RegExp('(^| )' + name + '=([^;]+)')
+    );
+    return match ? decodeURIComponent(match[2]) : null;
   }
 
   setActive(tab: string) {
@@ -94,6 +119,11 @@ export class DashboardSidePanelComponent implements OnInit {
 
     const adminButtons = [
       { tabName: 'manage users', iconPath: '/management.png' },
+      {
+        tabName: 'notifications',
+        iconPath: '/notification.png',
+        notificationCount: this.notificationCount,
+      },
     ];
 
     this.tabButtons =
@@ -102,7 +132,8 @@ export class DashboardSidePanelComponent implements OnInit {
 
   logOut() {
     sessionStorage.removeItem('user');
-    document.cookie = 'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie =
+      'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     this.router.navigate(['/login']);
   }
 }

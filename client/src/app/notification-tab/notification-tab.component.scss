@@ -1,0 +1,81 @@
+.container {
+  @apply mt-[40px] flex flex-col;
+}
+
+.heading {
+  @apply text-4xl font-nunito font-bold ml-[90px];
+}
+
+.notification-container {
+  @apply flex flex-col mt-10 justify-start items-center space-y-5 max-h-[700px] overflow-y-auto;
+  /* Added custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+/* Custom scrollbar for webkit browsers */
+.notification-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.notification-container::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-full;
+}
+
+.notification-container::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded-full;
+}
+
+.notification-container::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+.notification-card {
+  @apply w-[1200px] shadow-lg rounded-[15px] overflow-hidden transition-all duration-300;
+  /* Ensure cards don't shrink */
+  flex-shrink: 0;
+}
+
+.notification-header {
+  @apply w-full hover:bg-[#dcdcdcdb] transition duration-300 text-black font-semibold px-6 py-6 cursor-pointer;
+}
+
+.header-content {
+  @apply flex justify-between items-center w-full;
+}
+
+.notification-message {
+  @apply text-xl font-nunito flex-1 text-left;
+}
+
+.expand-icon {
+  @apply w-[20px] h-auto transition-transform duration-300;
+  
+  &.expanded {
+    @apply rotate-90;
+  }
+}
+
+.notification-details {
+  @apply max-h-0 overflow-hidden transition-all duration-300 ease-out bg-white border-t border-gray-200;
+  
+  &.expanded {
+    @apply max-h-[300px] ease-in;
+  }
+}
+
+.details-content {
+  @apply p-6 space-y-4;
+}
+
+.detail-row {
+  @apply flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0;
+}
+
+.detail-label {
+  @apply font-nunito font-semibold text-gray-700 text-sm;
+}
+
+.detail-value {
+  @apply font-nunito text-gray-600 text-sm;
+}

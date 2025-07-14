@@ -5,3 +5,7 @@
         @apply h-[25px] m-3;
     }
 }
+
+.notification-badge {
+    @apply absolute top-1 right-1 bg-red-600 text-white text-xs font-bold px-2 py-[2px] rounded-full;
+}

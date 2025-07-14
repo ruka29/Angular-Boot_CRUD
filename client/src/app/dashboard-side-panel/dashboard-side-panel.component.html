@@ -9,10 +9,11 @@
 
   <div class="upper-btn-container">
     <app-tab-button
-      *ngFor="let button of tabButtons"
+      *ngFor="let button of tabButtons" 
       [activeTab]="activeTab"
       [tabName]="button.tabName"
       [iconPath]="button.iconPath"
+      [notificationCount]="button.tabName === 'notifications' ? notificationCount : 0"
       (tabChange)="setActive($event)"
     ></app-tab-button>
   </div>

@@ -50,6 +50,12 @@
       (tabChange)="setActive($event.tab, $event.user)"
     ></app-manage-users>
 
+    <app-notification-tab
+      *ngSwitchCase="'notifications'"
+      [activeTab]="activeTab"
+      (tabChange)="setActive($event)"
+    ></app-notification-tab>
+
     <app-system-settings
       *ngSwitchCase="'system settings'"
     ></app-system-settings>
