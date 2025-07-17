@@ -17,12 +17,23 @@ import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
+    // Constructor Injection
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    // Setter Injection
     private TokenRepository tokenRepository;
 
+    @Autowired
+    public void setTokenRepository(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
+
+    // Field Injection
     @Autowired
     private PasswordEncoder passwordEncoder;
 

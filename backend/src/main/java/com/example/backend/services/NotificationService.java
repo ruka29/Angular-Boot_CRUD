@@ -9,8 +9,13 @@ import java.util.List;
 
 @Service
 public class NotificationService {
-    @Autowired
+
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    public void setNotificationRepository(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+    }
 
     public NotificationMessage saveNotification(NotificationMessage notificationMessage) {
         return notificationRepository.save(notificationMessage);
